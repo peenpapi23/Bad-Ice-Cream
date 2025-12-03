@@ -17,10 +17,12 @@ public class PanelDeJuego extends JPanel implements Runnable{
 	//Configuracion de Pantalla
 	final int tamañoPixel = 16;
 	final int escala = 3; 
+	public int nivelActual = 2;
 	
 	public final int originalTamañoPixel = tamañoPixel * escala; //Seria de 48 pixeles
 	final int maximoColumna = 16;
 	final int maximoFila = 12;
+	private GestorSonido sonidoJuego = new GestorSonido();
 	
 	public final int anchoPantalla = originalTamañoPixel * maximoColumna; //768 pixeles
 	public final int largoPantalla = originalTamañoPixel * maximoFila; // 576 pixeles
@@ -31,9 +33,6 @@ public class PanelDeJuego extends JPanel implements Runnable{
 	public final int maximoMundoFila = 18; 
 	public final int mundoAncho = originalTamañoPixel * maximoMundoColumna;
 	public final int mundoLargo = maximoMundoFila * maximoMundoFila;
-	
-	private GestorSonido sonidoJuego = new GestorSonido();
-
 	
 	//FPS
 	int FPS = 60;
@@ -64,7 +63,7 @@ public class PanelDeJuego extends JPanel implements Runnable{
 	}
 	
 	public void setObjetos() {
-		conf.conjuntoObjeto();
+		conf.cargarNivel(nivelActual);
 	}
 	
 	
@@ -107,22 +106,31 @@ public class PanelDeJuego extends JPanel implements Runnable{
 	    super.paintComponent(graficos);
 	    
 	    Graphics2D graficos2D = (Graphics2D) graficos;
-	    //Nivel1
+	    
 	    nivel.dibujo(graficos2D);
 	    
-	    //Objetos
-	    for(int i = 0; i< obj.length;i++) {
-	    	if (obj[i] != null) {
-	    		obj[i].dibujo(graficos2D,this);
-	    		
-	    	}
-	    }
 	    
-	    //Jugador
 	    jugador.dibujo(graficos2D);
 
 	    graficos2D.dispose();
 	}
+	
+	public void avanzarSiguienteNivel() {
+        nivelActual++; // Aumentamos 1 -> 2
+        
+        // 1. Cargamos el nuevo mapa de texto
+        // Nota: Tu clase Nivel1 debería tener el método cargarMapa público
+        nivel.cargarMapa("/mapa/nivel" + nivelActual + ".txt");
+        
+        // 2. Ponemos las frutas del nuevo nivel
+        setObjetos();
+        
+        // 3. Reiniciamos al jugador a la posición inicial
+        jugador.defaults();
+        
+        System.out.println("¡Bienvenido al Nivel " + nivelActual + "!");
+    }
 
 	
 }
+
