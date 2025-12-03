@@ -18,8 +18,8 @@ public class Jugador extends Entidad{
 	
 	public final int camaraX;
 	public final int camaraY;
-	
-	private int countObjet = 0;
+	public int puntuacion = 0;
+	private int countObjet = 0;  // Cuenta cuántas frutas llevas (para saber si ganaste)
 	
 	public Jugador(PanelDeJuego panelJuego, Teclado teclado) {
 		
@@ -30,8 +30,8 @@ public class Jugador extends Entidad{
 		camaraY =panelJuego.largoPantalla/2 - (panelJuego.originalTamañoPixel/2);
 		
 		areaSolida = new Rectangle(8,16,32,32);
-		areaSolidaX = areaSolida.x;
-		areaSolidaY = areaSolida.y;
+		
+		
 		defaults();
 		imagenJugador();
 		
@@ -63,6 +63,36 @@ public class Jugador extends Entidad{
 		}
 	}
 	
+	
+public void almacenar(int i) {
+        
+        if(i != 999) {
+            String nombreObjeto = panelJuego.obj[i].nombre;
+            
+            switch(nombreObjeto) {
+                
+                case "Banana":
+                    // ANTES: countObjet++;
+                    
+                    // AHORA (Corregido según PDF):
+                    puntuacion += 100; // Sumar 100 puntos
+                    countObjet++;      // Seguir contando frutas para saber cuándo ganar
+                    
+                    panelJuego.obj[i] = null; // Borrar la banana
+                    System.out.println("¡Comiste Banana! Puntos: " + puntuacion);
+                    break;
+                    
+                case "Uva":
+                    puntuacion += 50;
+                    countObjet++; // También deberías contar las uvas para el total
+                    panelJuego.obj[i] = null;
+                    System.out.println("¡Comiste Uva! Puntos: " + puntuacion);
+                    break;
+            }
+        }
+    }
+
+	
 	public void actualizar() {
 	    
 	    // Cambiar dirección SOLO si la tecla está presionada
@@ -85,10 +115,7 @@ public class Jugador extends Entidad{
 	        //Check Colision
 	        colisionOn = false;
 	        panelJuego.colision.check(this);
-	        
-	        int objIndex = panelJuego.colision.checkObjeto(this, true);
-	        almacenar(objIndex);
-	        
+
 	        if(!colisionOn) {
 	            switch(direccion) {
 	            case "arriba": mundoY -= velocidad; break;
@@ -101,31 +128,12 @@ public class Jugador extends Entidad{
 	        // Animación
 	        count++;
 	        if(count > 12) {
-	            if (numeroSprite == 1) {
-	            	numeroSprite = 2;
-	            }
-	            else if (numeroSprite ==2) {
-	            	numeroSprite = 1;
-	            }
+	            numeroSprite = (numeroSprite == 1 ? 2 : 1);
 	            count = 0;
 	        }
 	    }
 	}
-	
-	public void almacenar(int i) {
-		
-		if(i != 999) {
-			String nombre = panelJuego.obj[i].nombre;
-			
-			switch(nombre) {
-			case "Banana":
-				countObjet++;
-				panelJuego.obj[i] = null;
-				System.out.println(countObjet);
-				break;
-			}
-		}
-	}
+
 	
 	public void dibujo(Graphics2D graficos2D) {
 		
@@ -169,3 +177,4 @@ public class Jugador extends Entidad{
 		graficos2D.drawImage(imagen,camaraX,camaraY,panelJuego.originalTamañoPixel,panelJuego.originalTamañoPixel,null);
 	}
 }
+
